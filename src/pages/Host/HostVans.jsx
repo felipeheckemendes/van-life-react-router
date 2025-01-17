@@ -1,15 +1,13 @@
-import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLoaderData } from "react-router-dom";
 
-// import React from "react";
+export function loader() {
+  return fetch("/api/host/vans").then((res) => {
+    return res.json().then((data) => data.vans);
+  });
+}
+
 export default function HostVans() {
-  const [vans, setVans] = useState([]);
-
-  useEffect(() => {
-    fetch("/api/host/vans").then((res) => {
-      res.json().then((data) => setVans(data.vans));
-    });
-  }, []);
+  const vans = useLoaderData();
 
   const vansCards = vans.map((van) => (
     <Link to={`${van.id}`} key={van.id} className="host-van-link-wrapper">

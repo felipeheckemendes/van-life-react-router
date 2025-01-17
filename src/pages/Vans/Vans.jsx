@@ -1,34 +1,27 @@
-// import React from "react";
-// import { Link } from "react-router-dom";
-import { useState, useEffect } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useLoaderData, useSearchParams } from "react-router-dom";
 import { getVans } from "../../../api";
+
+export async function loader() {
+  async function loadVans() {
+    try {
+      const data = await getVans();
+      return data;
+    } catch (err) {
+      console.log(err);
+    }
+  }
+  const data = loadVans();
+  return data;
+}
+
 export default function Vans() {
-  const [vans, setVans] = useState([]);
   const [searchParams, setSearchParams] = useSearchParams();
   const typeFilter = searchParams.get("type");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const vans = useLoaderData();
 
   const filteredVans = !typeFilter
     ? vans
     : vans.filter((van) => van.type === typeFilter);
-
-  useEffect(() => {
-    async function loadVans() {
-      try {
-        setLoading(true);
-        const data = await getVans();
-        setVans(data);
-      } catch (err) {
-        console.log(err);
-        setError(err);
-      } finally {
-        setLoading(false);
-      }
-    }
-    loadVans();
-  }, []);
 
   function handleFilterChange(key, value) {
     return () => {
@@ -64,16 +57,6 @@ export default function Vans() {
       </Link>
     </div>
   ));
-
-  if (loading) {
-    return <h1>Loading...</h1>;
-  }
-
-  if (error) {
-    return (
-      <h1>There was an error: {error.message}. Please reload the page.</h1>
-    );
-  }
 
   return (
     <div className="van-list-container">
