@@ -1,70 +1,53 @@
-import React, { useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import {
+  Form,
+  redirect,
+  useActionData,
+  useNavigation,
+  useSearchParams,
+} from "react-router-dom";
 import { loginUser } from "../../api";
 // import { useNavigate } from "react-router-dom";
 
+export async function action({ request }) {
+  try {
+    const redirectTo =
+      new URL(request.url).searchParams.get("redirectTo") || "/host";
+    const formData = await request.formData();
+    const credentials = Object.fromEntries(formData.entries());
+    const returnData = await loginUser(credentials);
+    console.log(returnData);
+    localStorage.setItem("loggedIn", "true");
+    const response = redirect(redirectTo);
+    response.body = true;
+    return response;
+  } catch (err) {
+    return err;
+  }
+}
+
 export default function Login() {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const message = searchParams.get("message");
-  const [status, setStatus] = useState("idle");
-  const [error, setError] = useState(null);
-  const navigate = useNavigate();
-
-  const [loginFormData, setLoginFormData] = React.useState({
-    email: "",
-    password: "",
-  });
-
-  function handleSubmit(e) {
-    e.preventDefault();
-    (async function () {
-      try {
-        setError(null);
-        setStatus("submitting");
-        const data = await loginUser(loginFormData);
-        setSearchParams("");
-        console.log(data);
-        navigate("/host", { replace: true });
-      } catch (err) {
-        setError(err);
-      } finally {
-        setStatus("idle");
-      }
-    })();
-  }
-
-  function handleChange(e) {
-    const { name, value } = e.target;
-    setLoginFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  }
-
+  const error = useActionData();
+  const navigation = useNavigation();
+  localStorage.setItem("loggedIn", "false");
   return (
     <div className="login-container">
       <h1>Sign in to your account</h1>
       {message ? <h3 className="red">{message}</h3> : null}
       {error ? <h3 className="red">{error.message}</h3> : null}
-      <form onSubmit={handleSubmit} className="login-form">
-        <input
-          name="email"
-          onChange={handleChange}
-          type="email"
-          placeholder="Email address"
-          value={loginFormData.email}
-        />
-        <input
-          name="password"
-          onChange={handleChange}
-          type="password"
-          placeholder="Password"
-          value={loginFormData.password}
-        />
-        <button disabled={status === "submitting"}>
-          {status === "submitting" ? "Logging in" : "Log in"}
+      <Form replace method="post" className="login-form">
+        <input name="email" type="email" placeholder="Email address" />
+        <input name="password" type="password" placeholder="Password" />
+        <ul className="blue">
+          <p className="blue">Use testing credentials:</p>
+          <li>Email: b@b.com</li>
+          <li>Password: p123</li>
+        </ul>
+        <button disabled={navigation.state === "submitting"}>
+          {navigation.state === "submitting" ? "Logging in" : "Log in"}
         </button>
-      </form>
+      </Form>
     </div>
   );
 }

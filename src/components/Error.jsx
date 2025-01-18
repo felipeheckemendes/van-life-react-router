@@ -5,7 +5,7 @@ export default function Error() {
   console.log(error);
   return (
     <>
-      <h1>Error: {error.message}</h1>
+      <h4>Error: {error.message}</h4>
       <pre>
         {error.status} - {error.statusText}
       </pre>

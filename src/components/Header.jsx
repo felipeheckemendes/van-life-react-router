@@ -1,6 +1,10 @@
 import { Link, NavLink } from "react-router-dom";
 import imageUrl from "../assets/images/avatar-svgrepo-com.svg";
 
+function fakeLogOut() {
+  localStorage.removeItem("loggedIn");
+}
+
 export default function Header() {
   const styleActiveNav = ({ isActive }) => {
     return isActive ? "nav-active" : null;
@@ -17,6 +21,7 @@ export default function Header() {
         <NavLink className={styleActiveNav} to="/vans">Vans</NavLink>
         <NavLink className={styleActiveNav} to="/about">About</NavLink>
         <Link to="login" className="login-link"><img src={imageUrl} className="login-icon"/></Link>
+        <button onClick={fakeLogOut}>X</button>
       </nav>
     </header>
   );
