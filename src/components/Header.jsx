@@ -21,7 +21,7 @@ export default function Header() {
         <NavLink className={styleActiveNav} to="/vans">Vans</NavLink>
         <NavLink className={styleActiveNav} to="/about">About</NavLink>
         <Link to="login" className="login-link"><img src={imageUrl} className="login-icon"/></Link>
-        <button onClick={fakeLogOut}>X</button>
+        <button onClick={fakeLogOut}>Logout</button>
       </nav>
     </header>
   );
